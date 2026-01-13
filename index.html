@@ -117,30 +117,31 @@ function envoyerPresence() {
         saison: "2025-2026"
     };
     
-    fetch("https://script.google.com/macros/s/AKfycbxf4oMD_mRMeoYGwufNkEtmtDoCvt4jaVLwsISitxSsUPG-aUzcvssgNK12BwgEnto/exec", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        nom: "BENKACEM",
-        prenom: "Ahmed",
-        categorie: "U13",
-        saison: "2025-2026"
-    })
-})
-.then(response => response.json())
-.then(result => {
-    if (result.status === "success") {
-        alert("Présence enregistrée avec succès ✅");
-    } else {
-        alert("Erreur serveur : " + result.message);
-    }
-})
-.catch(error => {
-    console.error(error);
-    alert("Erreur de connexion ❌");
-});
+    <form id="presenceForm" 
+      action="https://script.google.com/macros/s/AKfycbzLuWXnlHPAf5V5vDh04vn1wRvZ2uxwXQfSlYbxJXeyltaq8YIhv7T79GpFJ6IB_Rhz/exec"
+      method="POST"
+      target="hiddenFrame">
+
+  <input type="hidden" name="nom" value="BENKACEM">
+  <input type="hidden" name="prenom" value="Ahmed">
+  <input type="hidden" name="categorie" value="U13">
+  <input type="hidden" name="saison" value="2025-2026">
+
+  <button class="btn" type="submit" onclick="presenceOK()">
+    ✔ Enregistrer ma présence
+  </button>
+</form>
+
+<iframe name="hiddenFrame" style="display:none;"></iframe>
+
+<script>
+function presenceOK() {
+  setTimeout(() => {
+    alert("Présence enregistrée avec succès ✅");
+  }, 500);
+}
+</script>
+
     
 <script>
 </body>
