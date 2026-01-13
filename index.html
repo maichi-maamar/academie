@@ -117,13 +117,14 @@ function envoyerPresence() {
         saison: "2025-2026"
     };
 
-    fetch("https://script.google.com/macros/s/AKfycbyBHZeOEtGmQz2tbO-n4Qsiv0KCKHB_g3RrHtbtdZSIBmZQYCPQCIp_IBqOLZ-b_bqW/exec", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {"Content-Type": "application/json"}
-    })
-    .then(() => alert("Présence enregistrée avec succès ✅"))
-    .catch(() => alert("Erreur lors de l’enregistrement ❌"));
+    fetch("https://script.google.com/macros/s/AKfycbw4-bfAVW0fF8XdmHm7uWizWw3jy6Z8dXjhJkf-VzwAw8YmBP4k9Dv6qihb2JGbuBJr/exec", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {"Content-Type": "application/json"}
+})
+.then(res => res.json())
+.then(() => alert("Présence enregistrée avec succès ✅"))
+.catch(() => alert("Erreur lors de l’enregistrement ❌"));
 }
 </script>
 </body>
