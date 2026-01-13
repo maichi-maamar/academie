@@ -2,28 +2,76 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Académie Sportive - NFC</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carte NFC – Académie de Football</title>
 
 <style>
-body { font-family: Arial; background:#f2f4f7; margin:0; }
-.container { max-width:800px; margin:auto; background:#fff; padding:20px; }
-h1 { text-align:center; }
-.image-zone {
-  height:227px; border:2px dashed #888;
-  display:flex; align-items:center; justify-content:center;
-  margin-bottom:20px; color:#666;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #222;
 }
-.section { border:1px solid #ddd; padding:15px; margin-bottom:20px; }
-.section h2 { margin-top:0; border-bottom:1px solid #ddd; }
-.field { margin-bottom:10px; }
-.field label { font-weight:bold; display:block; }
-.field input { width:100%; padding:6px; }
-.nfc-badge { text-align:center; font-size:18px; margin:15px 0; }
-button {
-  width:100%; padding:12px;
-  background:#0a7cff; color:white;
-  border:none; font-size:16px;
+
+.container {
+    max-width: 420px;
+    margin: auto;
+    padding: 15px;
+}
+
+.academy-name {
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.player-image {
+    height: 226px; /* 60 mm */
+    background: #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-image img {
+    max-height: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+    margin-top: 0;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.btn {
+    width: 100%;
+    padding: 15px;
+    background: #1e88e5;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.footer {
+    text-align: center;
+    font-size: 13px;
+    color: #777;
+    margin-top: 20px;
 }
 </style>
 </head>
@@ -31,50 +79,52 @@ button {
 <body>
 <div class="container">
 
-<h1>Nom de l’Académie</h1>
+    <div class="academy-name">Académie Football Excellence</div>
 
-<div class="image-zone">Photo joueur (60 mm)</div>
+    <div class="player-image">
+        <img src="joueur.jpg" alt="Photo du joueur">
+    </div>
 
-<div class="nfc-badge">📶 BADGE NFC ACTIF – Scan pour présence</div>
+    <div class="card">
+        <h3>Informations du joueur</h3>
+        <p><strong>Nom :</strong> BENKACEM</p>
+        <p><strong>Prénom :</strong> Ahmed</p>
+        <p><strong>Âge :</strong> 13 ans</p>
+        <p><strong>Poids :</strong> 45 kg</p>
+        <p><strong>Catégorie :</strong> U13</p>
+        <p><strong>Année sportive :</strong> 2025 – 2026</p>
+    </div>
 
-<form id="presenceForm">
-  <input type="hidden" name="id_joueur" id="J045">
+    <div class="card">
+        <h3>Académie</h3>
+        <p><strong>Entraîneur :</strong> Coach Mourad</p>
+        <p><strong>Téléphone :</strong> <a href="tel:+213555000000">+213 555 00 00 00</a></p>
+        <p><strong>Facebook :</strong> <a href="https://facebook.com/academie" target="_blank">Page officielle</a></p>
+    </div>
 
+    <button class="btn" onclick="envoyerPresence()">✔ Enregistrer ma présence</button>
 
-<div class="section">
-<h2>Informations Joueur</h2>
-<div class="field"><label>MAICHI MAAMAR</label><input name="MAICHI Maamar" required></div>
-<div class="field"><label>190 (cm)</label><input name="190"></div>
-<div class="field"><label>97 (kg)</label><input name="97"></div>
-<div class="field"><label>Catégorie</label><input name="senior"></div>
-<div class="field"><label>Année sportive</label><input name="2025 - 2026"></div>
-<div class="field"><label>Taux de présence (%)</label><input name="presence"></div>
-</div>
-
-<div class="section">
-<h2>Informations Club</h2>
-<div class="field"><label>Page Facebook</label><input name="facebook"></div>
-<div class="field"><label>Téléphone Entraîneur</label><input name="telephone"></div>
-</div>
-
-<button type="submit">📲 Valider présence NFC</button>
-</form>
-
-<footer style="text-align:center;font-size:12px;color:#666">
-Académie Sportive – NFC 2025
-</footer>
+    <div class="footer">Carte NFC officielle – Académie</div>
 
 </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycby4loat6mWpAb74xtlGWN1W6-XLDAtXN10jRA2wcbb8bXDGAGQaEI8g-pciJwcjCRxH/exec";
-document.getElementById("presenceForm").addEventListener("submit", e => {
-  e.preventDefault();
-  fetch(scriptURL,{method:"POST",body:new FormData(e.target)})
-  .then(()=>alert("Présence enregistrée ✅"))
-  .catch(()=>alert("Erreur ❌"));
-});
-</script>
+function envoyerPresence() {
+    const data = {
+        nom: "BENKACEM",
+        prenom: "Ahmed",
+        categorie: "U13",
+        saison: "2025-2026"
+    };
 
+    fetch("COLLE_ICI_L_URL_DU_SCRIPT_GOOGLE", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {"Content-Type": "application/json"}
+    })
+    .then(() => alert("Présence enregistrée avec succès ✅"))
+    .catch(() => alert("Erreur lors de l’enregistrement ❌"));
+}
+</script>
 </body>
 </html>
