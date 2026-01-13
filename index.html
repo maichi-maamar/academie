@@ -116,16 +116,32 @@ function envoyerPresence() {
         categorie: "U13",
         saison: "2025-2026"
     };
-
-    fetch("https://script.google.com/macros/s/AKfycbw4-bfAVW0fF8XdmHm7uWizWw3jy6Z8dXjhJkf-VzwAw8YmBP4k9Dv6qihb2JGbuBJr/exec", {
+    
+    fetch("https://script.google.com/macros/s/AKfycbxn1x9-KkpDBCnfk9U2KzUcgZj3KnkqksrnKF08hlaq0k0IdJWFLAnQC-WRrfR8uIxk/exec", {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: {"Content-Type": "application/json"}
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        nom: "BENKACEM",
+        prenom: "Ahmed",
+        categorie: "U13",
+        saison: "2025-2026"
+    })
 })
 .then(res => res.json())
-.then(() => alert("Présence enregistrée avec succès ✅"))
-.catch(() => alert("Erreur lors de l’enregistrement ❌"));
-}
+.then(data => {
+    if (data.status === "success") {
+        alert("Présence enregistrée avec succès ✅");
+    } else {
+        alert("Erreur : " + data.message);
+    }
+})
+.catch(err => {
+    alert("Erreur lors de l’enregistrement ❌");
+    console.error(err);
+});
+
 </script>
 </body>
 </html>
