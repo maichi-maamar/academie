@@ -117,7 +117,7 @@ function envoyerPresence() {
         saison: "2025-2026"
     };
     
-    fetch("https://script.google.com/macros/library/d/1RzCiiJN2R-YepAEf3EFFf7TSzaKcHALPYSmtJwA5svZTpft_1iHCT0nk/7", {
+    fetch("https://script.google.com/macros/s/AKfycbxf4oMD_mRMeoYGwufNkEtmtDoCvt4jaVLwsISitxSsUPG-aUzcvssgNK12BwgEnto/exec", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -129,17 +129,17 @@ function envoyerPresence() {
         saison: "2025-2026"
     })
 })
-.then(res => res.json())
-.then(data => {
-    if (data.status === "success") {
+.then(response => response.json())
+.then(result => {
+    if (result.status === "success") {
         alert("Présence enregistrée avec succès ✅");
     } else {
-        alert("Erreur : " + data.message);
+        alert("Erreur serveur : " + result.message);
     }
 })
-.catch(err => {
-    alert("Erreur lors de l’enregistrement ❌");
-    console.error(err);
+.catch(error => {
+    console.error(error);
+    alert("Erreur de connexion ❌?");
 });
     
 <script>
