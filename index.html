@@ -117,7 +117,7 @@ function envoyerPresence() {
         saison: "2025-2026"
     };
     
-    fetch("https://docs.google.com/spreadsheets/d/1C4u_gPQoG3qNnGDQactn75fAcrFloafvENwH5X4o0DQ/edit?usp=sharing", {
+    fetch("https://script.google.com/macros/s/AKfycbxf4oMD_mRMeoYGwufNkEtmtDoCvt4jaVLwsISitxSsUPG-aUzcvssgNK12BwgEnto/exec", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -139,7 +139,7 @@ function envoyerPresence() {
 })
 .catch(error => {
     console.error(error);
-    alert("Erreur de connexion ❌?");
+    alert("Erreur de connexion ❌");
 });
     
 <script>
