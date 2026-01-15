@@ -107,38 +107,55 @@ body {
     <div class="footer">Carte NFC officielle – Académie</div>
 
 </div>
-
-<script>
-function envoyerPresence() {
-    const data = {
-        nom: "BENKACEM",
-        prenom: "Ahmed",
-        categorie: "U13",
-        saison: "2025-2026"
-    };
-    
-    <form id="presenceForm" 
-      action="https://script.google.com/macros/s/AKfycbzLuWXnlHPAf5V5vDh04vn1wRvZ2uxwXQfSlYbxJXeyltaq8YIhv7T79GpFJ6IB_Rhz/exec"
+ 
+<form id="presenceForm"
+      action="https://script.google.com/macros/s/AKfycbxUPnFd3D9dfWByLUw123jXTQid0osMdkNpR8x9Pa-VujmYGvzUnc0Qi0Kqrb8IEr0Y/exec"
       method="POST"
-      target="hiddenFrame">
+      target="hiddenFrame"
+      onsubmit="return handleSubmit();">
+
+  <!-- ID UNIQUE DE LA CARTE NFC -->
+  <input type="hidden" name="player_id" value="AFEX-U13-0007">
 
   <input type="hidden" name="nom" value="BENKACEM">
   <input type="hidden" name="prenom" value="Ahmed">
   <input type="hidden" name="categorie" value="U13">
   <input type="hidden" name="saison" value="2025-2026">
 
-  <button class="btn" type="submit" onclick="presenceOK()">
+  <button class="btn" type="submit">
     ✔ Enregistrer ma présence
   </button>
 </form>
 
-<iframe name="hiddenFrame" style="display:none;"></iframe>
+<iframe name="hiddenFrame" style="display:none;" onload="checkResult()"></iframe>
 
 <script>
-function presenceOK() {
-  setTimeout(() => {
-    alert("Présence enregistrée avec succès ✅");
-  }, 500);
+let alreadyChecked = false;
+
+function handleSubmit() {
+  alreadyChecked = false;
+  return true;
+}
+
+function checkResult() {
+  if (alreadyChecked) return;
+  alreadyChecked = true;
+
+  try {
+    const response = document
+      .querySelector("iframe")
+      .contentDocument
+      .body
+      .innerText;
+
+    if (response.includes("ALREADY")) {
+      alert("⛔ Présence déjà enregistrée aujourd’hui");
+    } else {
+      alert("✅ Présence enregistrée avec succès");
+    }
+  } catch (e) {
+    alert("✅ Présence enregistrée");
+  }
 }
 </script>
 
