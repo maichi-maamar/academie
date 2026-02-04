@@ -157,6 +157,70 @@ function checkResult() {
   }
 }
 </script>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Présence NFC</title>
+<style>
+body { font-family: Arial; text-align:center; }
+#msg { font-size:18px; margin-top:20px; }
+.ok { color:green; }
+.no { color:red; }
+</style>
+</head>
+
+<body>
+<h2>Badge présence</h2>
+<p>Approchez la carte NFC</p>
+<div id="msg"></div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuXpOlnAb-exlwxObd0hJT3V2M2pHTJquHiSuY_8LIVeoa8LNGiAirzFSb7Ls6lhYy/exec";
+
+function getReaderID() {
+  let id = localStorage.getItem("READER_ID");
+  if (!id) {
+    id = "READER-" + Math.random().toString(36).substr(2,8);
+    localStorage.setItem("READER_ID", id);
+  }
+  return id;
+}
+
+async function scanNFC() {
+  const reader = new NDEFReader();
+  await reader.scan();
+
+  reader.onreading = event => {
+    const uid = event.serialNumber;
+    send(uid);
+    navigator.vibrate(200);
+  };
+}
+
+function send(uid) {
+  const reader = getReaderID();
+  fetch(`${SCRIPT_URL}?uid=${uid}&reader=${reader}`)
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === "OK") {
+        msg(`✔ Présence validée : ${d.name}`, "ok");
+      } else {
+        msg("✖ Présence refusée", "no");
+      }
+    });
+}
+
+function msg(t, c) {
+  const m = document.getElementById("msg");
+  m.className = c;
+  m.innerText = t;
+}
+
+scanNFC();
+</script>
+</body>
+</html>
 
 </body>
 </html>
