@@ -148,8 +148,11 @@ function getReaderID() {
     id = "READER-" + Math.random().toString(36).substr(2,8);
     localStorage.setItem("READER_ID", id);
   }
+
+  alert("ID LECTEUR = " + id); // 👈 ICI
   return id;
-}
+    }
+
 
 async function scanNFC() {
   const reader = new NDEFReader();
