@@ -119,43 +119,7 @@ body {
   <input type="hidden" name="categorie" value="U13">
   <input type="hidden" name="saison" value="2025-2026">
 
-  <button class="btn" onclick="envoyerPresence()">
-    ✔ Enregistrer ma présence
-  </button>
-</form>
 
-<iframe name="hiddenFrame" style="display:none;" onload="checkResult()"></iframe>
-
-<script>
-let alreadyHandled = false;
-
-function envoyerPresence() {
-  alreadyHandled = false;
-  document.forms[0].submit();
-}
-
-function checkResult() {
-  if (alreadyHandled) return;
-  alreadyHandled = true;
-
-  try {
-    const txt = document
-      .querySelector("iframe")
-      .contentDocument
-      .body
-      .innerText;
-
-    if (txt.includes("ALREADY")) {
-      alert("⛔ Présence déjà enregistrée aujourd’hui");
-    } else if (txt.includes("OK")) {
-      alert("✅ Présence enregistrée avec succès");
-    } else {
-      alert("⚠️ Erreur serveur");
-    }
-  } catch {
-    alert("✅ Présence enregistrée");
-  }
-}
 </script>
 <!DOCTYPE html>
 <html lang="fr">
