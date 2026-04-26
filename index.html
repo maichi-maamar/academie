@@ -107,8 +107,11 @@ const DEFAULT_PLAYER_ID = "AFEX-U13-0007"; // joueur affiché automatiquement
 function getReaderID() {
     return "COACH-U13";
 }   
-    window.onload = function() {
-    loadPlayer(DEFAULT_PLAYER_ID);
+  const urlParams = new URLSearchParams(window.location.search);
+const playerId = urlParams.get("player") || "AFEX-U13-0007";
+
+window.onload = function() {
+    loadPlayer(playerId);
 };
 
 function loadPlayer(playerId) {
@@ -137,7 +140,7 @@ async function scanNFC() {
         msg("NFC non supporté sur cet appareil", "red");
     }
 }
-function fetchPlayer(uid) {
+   function fetchPlayer(uid) {
     const reader = getReaderID();
 
     fetch(`${SCRIPT_URL}?uid=${uid}&reader=${reader}`)
@@ -175,4 +178,4 @@ function msg(text, color) {
 </script>
 
 </body>
-</html>
+</html> 
