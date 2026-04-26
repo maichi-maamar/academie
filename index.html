@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Carte NFC Académie Football</title>
+
 <style>
 body {
     margin: 0;
@@ -11,7 +12,7 @@ body {
     background: linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
     color: white;
 }
-    .container {
+.container {
     max-width: 430px;
     margin: auto;
     padding: 15px;
@@ -22,7 +23,6 @@ body {
     padding: 20px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.45);
     position: relative;
-    overflow: hidden;
 }
 .badge-label {
     position: absolute;
@@ -34,7 +34,6 @@ body {
     border-radius: 8px;
     font-weight: bold;
 }
-
 .player-photo {
     width: 100%;
     height: 250px;
@@ -42,17 +41,12 @@ body {
     border-radius: 15px;
     margin-bottom: 15px;
 }
-    .player-name {
+  .player-name {
     font-size: 28px;
     font-weight: bold;
     text-align: center;
 }
-
-.player-info p {
-    margin: 6px 0;
-    font-size: 15px;
-}
-
+.player-info p { margin: 6px 0; }
 .section {
     background: rgba(255,255,255,0.1);
     padding: 15px;
@@ -69,10 +63,8 @@ body {
     color: white;
     font-size: 18px;
     cursor: pointer;
-    font-weight: bold;
 }
-
-#msg {
+   #msg {
     text-align: center;
     margin-top: 15px;
     font-size: 18px;
@@ -82,13 +74,13 @@ a { color: #facc15; }
 </style>
 </head>
 <body>
+ <div class="container">
+    <div class="konami-card">
+        <div class="badge-label" id="badge">BADGE OFFICIEL</div>
+        <img id="photo" class="player-photo" src="default-player.jpg" alt="Photo joueur">
+        <div class="player-name" id="fullName">Chargement joueur...</div>
 
-<div class="container">
-    <div class="konami-card" id="playerCard">
-        <div class="badge-label" id="badge">NFC BADGE</div>
-        <img id="photo" class="player-photo" src="" alt="Photo joueur">
-        <div class="player-name" id="fullName">Scan NFC</div>
-          <div class="section player-info">
+        <div class="section player-info">
             <p><strong>Âge :</strong> <span id="age"></span></p>
             <p><strong>Poids :</strong> <span id="poids"></span></p>
             <p><strong>Catégorie :</strong> <span id="categorie"></span></p>
@@ -99,7 +91,7 @@ a { color: #facc15; }
 
         <div class="section">
             <p><strong>Coach :</strong> <span id="coach"></span></p>
-            <p><strong>Téléphone :</strong> <a id="telephone" href="#"></a></p>
+            <p><strong>Téléphone :</strong> <a id="telephone"></a></p>
             <p><strong>Facebook :</strong> <a id="facebook" target="_blank">Page officielle</a></p>
         </div>
     </div>
@@ -109,17 +101,27 @@ a { color: #facc15; }
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxXEyz9NYpqvBv46kI5LNMkfdHFfkiPPTchfCl5vexzNXNJTeqersI83sKQSvxT0fHdg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1T_LaCTL_q4cRUw7VtcZSk_FVUcAQl2rAN-4axJCUOIhRnPkOqkwuNZXn3-uDR6X4Xg/exec";
+const DEFAULT_PLAYER_ID = "AFEX-U13-0007"; // joueur affiché automatiquement
 
 function getReaderID() {
-    let id = localStorage.getItem("READER_ID");
-    if (!id) {
-        id = "READER-" + Math.random().toString(36).substr(2,8);
-        localStorage.setItem("READER_ID", id);
-    }
-    return id;
+    return "COACH-U13";
+}   
+    window.onload = function() {
+    loadPlayer(DEFAULT_PLAYER_ID);
+};
+
+function loadPlayer(playerId) {
+    fetch(`${SCRIPT_URL}?player_id=${playerId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "OK") {
+                updateCard(data);
+            }
+        });
 }
-    async function scanNFC() {
+
+async function scanNFC() {
     try {
         const reader = new NDEFReader();
         await reader.scan();
@@ -135,7 +137,6 @@ function getReaderID() {
         msg("NFC non supporté sur cet appareil", "red");
     }
 }
-
 function fetchPlayer(uid) {
     const reader = getReaderID();
 
@@ -150,7 +151,7 @@ function fetchPlayer(uid) {
             }
         });
 }
-    function updateCard(data) {
+function updateCard(data) {
     document.getElementById("photo").src = data.photo;
     document.getElementById("fullName").innerText = data.nom + " " + data.prenom;
     document.getElementById("age").innerText = data.age + " ans";
