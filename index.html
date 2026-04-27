@@ -43,8 +43,20 @@ body {
     height: 260px;
     object-fit: cover;
     border-radius: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     border: 3px solid rgba(255,255,255,0.2);
+}
+
+.btn-photo {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #facc15;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .player-name {
@@ -98,6 +110,13 @@ a {
              src="https://via.placeholder.com/400x500?text=Photo+Joueur"
              alt="Photo joueur">
 
+        <!-- BOUTON CHANGER PHOTO -->
+        <button class="btn-photo" onclick="document.getElementById('fileInput').click()">
+            📷 Changer photo joueur
+        </button>
+
+        <input type="file" id="fileInput" accept="image/*" style="display:none;">
+
         <div class="player-name" id="fullName">Chargement...</div>
 
         <div class="section">
@@ -137,13 +156,8 @@ window.onload = () => loadPlayer(playerId);
 function loadPlayer(playerId) {
 
     fetch(`${SCRIPT_URL}?player_id=${playerId}`)
-        .then(r => {
-            if (!r.ok) throw new Error("HTTP " + r.status);
-            return r.json();
-        })
+        .then(r => r.json())
         .then(data => {
-
-            console.log(data);
 
             if (data.status === "OK") {
                 updateCard(data);
@@ -154,57 +168,81 @@ function loadPlayer(playerId) {
         })
         .catch(err => {
             console.error(err);
-            msg("Erreur de chargement API", "red");
+            msg("Erreur API", "red");
         });
 }
 
 function updateCard(data) {
 
-    // PHOTO dynamique sécurisée
     document.getElementById("photo").src =
-        (data.photo && data.photo.trim() !== "")
-        ? data.photo
-        : "https://via.placeholder.com/400x500?text=Photo";
+        data.photo || "https://via.placeholder.com/400x500?text=Photo";
 
     document.getElementById("fullName").innerText =
         (data.nom || "") + " " + (data.prenom || "");
 
-    document.getElementById("age").innerText =
-        data.age || "";
+    document.getElementById("age").innerText = data.age || "";
+    document.getElementById("poids").innerText = data.poids || "";
+    document.getElementById("categorie").innerText = data.categorie || "";
+    document.getElementById("poste").innerText = data.poste || "";
+    document.getElementById("emplacement").innerText = data.emplacement || "";
+    document.getElementById("saison").innerText = data.saison || "";
+    document.getElementById("coach").innerText = data.coach || "";
 
-    document.getElementById("poids").innerText =
-        data.poids || "";
+    document.getElementById("telephone").innerText = data.telephone || "";
+    document.getElementById("telephone").href = "tel:" + (data.telephone || "");
 
-    document.getElementById("categorie").innerText =
-        data.categorie || "";
+    document.getElementById("facebook").href = data.facebook || "#";
 
-    document.getElementById("poste").innerText =
-        data.poste || "";
+    document.getElementById("badge").innerText = data.badge || "PLAYER";
+}
 
-    document.getElementById("emplacement").innerText =
-        data.emplacement || "";
+/* =========================
+   UPLOAD PHOTO
+========================= */
 
-    document.getElementById("saison").innerText =
-        data.saison || "";
+document.getElementById("fileInput").addEventListener("change", function () {
 
-    document.getElementById("coach").innerText =
-        data.coach || "";
+    const file = this.files[0];
+    if (!file) return;
 
-    // TELEPHONE
-    document.getElementById("telephone").innerText =
-        data.telephone || "";
+    const reader = new FileReader();
 
-    document.getElementById("telephone").href =
-        "tel:" + (data.telephone || "");
+    reader.onload = function () {
 
-    
-    // FACEBOOK
-    document.getElementById("facebook").href =
-        data.facebook || "#";
+        const base64 = reader.result;
 
-    // BADGE
-    document.getElementById("badge").innerText =
-        data.badge || "PLAYER";
+        uploadPhoto(base64);
+    };
+
+    reader.readAsDataURL(file);
+});
+
+function uploadPhoto(base64) {
+
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        body: new URLSearchParams({
+            player_id: playerId,
+            image_url: base64
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+
+        if (data.status === "OK") {
+            msg("Photo mise à jour ✔", "green");
+
+            // mise à jour immédiate
+            document.getElementById("photo").src = base64;
+
+        } else {
+            msg("Erreur upload", "red");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        msg("Erreur serveur", "red");
+    });
 }
 
 function msg(text, color) {
