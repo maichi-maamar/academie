@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carte Joueur Académie Football</title>
+<title>Carte Joueur Académie Football Premium</title>
 
 <style>
 body {
@@ -44,8 +44,10 @@ body {
     object-fit: cover;
     border-radius: 15px;
     margin-bottom: 15px;
+    border: 3px solid rgba(255,255,255,0.2);
 }
-  .player-name {
+
+.player-name {
     text-align: center;
     font-size: 28px;
     font-weight: bold;
@@ -68,8 +70,11 @@ body {
     margin-top: 20px;
     font-size: 14px;
 }
+
 a {
     color: #facc15;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 #msg {
@@ -79,12 +84,21 @@ a {
 }
 </style>
 </head>
+
 <body>
- <div class="container">
+
+<div class="container">
+
     <div class="konami-card">
+
         <div class="badge-label" id="badge">BADGE</div>
 
-        <img id="photo" class="player-photo" src="default-player.jpg" alt="Photo joueur">
+        <!-- Photo dynamique -->
+        <img id="photo"
+             class="player-photo"
+             src="https://via.placeholder.com/400x500?text=Photo+Joueur"
+             alt="Photo joueur"
+             onerror="this.src='https://via.placeholder.com/400x500?text=Photo+Indisponible';">
 
         <div class="player-name" id="fullName">Chargement...</div>
 
@@ -102,6 +116,7 @@ a {
             <p><strong>Téléphone :</strong> <a id="telephone"></a></p>
             <p><strong>Facebook :</strong> <a id="facebook" target="_blank">Page officielle</a></p>
         </div>
+
     </div>
 
     <div id="msg"></div>
@@ -109,21 +124,29 @@ a {
     <div class="footer">
         Carte officielle Académie Football Premium
     </div>
-</div>
- <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQJZFTbD0Q43Oyv8Jfu-XgU9opSw97dwNPxpZfvL7n-z1DU8ZMJEEVKySp0re0BkkqJA/exec";
 
+</div>
+
+<script>
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby9z3zV4UeLIliLhXpOEYkyZwpF90RkLd8i3-s7obyzLil1S5m93TXIxcYbgQA5i-h-Yw/exec";
+
+// Lecture dynamique de l'URL
 const urlParams = new URLSearchParams(window.location.search);
 const playerId = urlParams.get("player_id") || "100";
 
+// Chargement auto
 window.onload = function() {
     loadPlayer(playerId);
 };
 
+// Récupération données Google Sheets
 function loadPlayer(playerId) {
+
     fetch(`${SCRIPT_URL}?player_id=${playerId}`)
         .then(response => response.json())
         .then(data => {
+
             console.log(data);
 
             if (data.status === "OK") {
@@ -131,35 +154,78 @@ function loadPlayer(playerId) {
             } else {
                 msg("Joueur introuvable", "red");
             }
+
         })
         .catch(error => {
+
             console.error(error);
             msg("Erreur de connexion", "red");
+
         });
 }
+
+// Mise à jour carte complète
 function updateCard(data) {
-    document.getElementById("photo").src = data.photo || "default-player.jpg";
-    document.getElementById("fullName").innerText = data.nom + " " + data.prenom;
-    document.getElementById("age").innerText = data.age + " ans";
-    document.getElementById("poids").innerText = data.poids + " kg";
-    document.getElementById("categorie").innerText = data.categorie;
-    document.getElementById("poste").innerText = data.poste;
-    document.getElementById("emplacement").innerText = data.emplacement;
-    document.getElementById("saison").innerText = data.saison;
-    document.getElementById("coach").innerText = data.coach;
 
-    document.getElementById("telephone").innerText = data.telephone;
-    document.getElementById("telephone").href = "tel:" + data.telephone;
+    // Photo dynamique sécurisée
+    const photoElement = document.getElementById("photo");
 
-    document.getElementById("facebook").href = data.facebook;
+    if (data.photo && data.photo.trim() !== "") {
+        photoElement.src = data.photo;
+    } else {
+        photoElement.src =
+            "https://via.placeholder.com/400x500?text=Photo+Joueur";
+    }
 
-    document.getElementById("badge").innerText = data.badge;
+    document.getElementById("fullName").innerText =
+        data.nom + " " + data.prenom;
+
+    document.getElementById("age").innerText =
+        data.age + " ans";
+
+    document.getElementById("poids").innerText =
+        data.poids + " kg";
+
+    document.getElementById("categorie").innerText =
+        data.categorie;
+
+    document.getElementById("poste").innerText =
+        data.poste;
+
+    document.getElementById("emplacement").innerText =
+        data.emplacement;
+
+    document.getElementById("saison").innerText =
+        data.saison;
+
+    document.getElementById("coach").innerText =
+        data.coach;
+
+    // Téléphone dynamique
+    document.getElementById("telephone").innerText =
+        data.telephone;
+
+    document.getElementById("telephone").href =
+        "tel:" + data.telephone;
+
+    // Facebook dynamique
+    document.getElementById("facebook").href =
+        data.facebook;
+
+    // Badge dynamique
+    document.getElementById("badge").innerText =
+        data.badge;
 }
+
+// Messages
 function msg(text, color) {
+
     const m = document.getElementById("msg");
+
     m.innerText = text;
     m.style.color = color;
 }
+
 </script>
 
 </body>
