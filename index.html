@@ -3,84 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carte NFC Académie Football</title>
+<title>Carte Joueur Académie Football</title>
 
 <style>
 body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#0f172a,#1d4ed8,#60a5fa);
     color: white;
 }
+
 .container {
     max-width: 430px;
     margin: auto;
-    padding: 15px;
+    padding: 20px;
 }
-    .konami-card {
-    background: linear-gradient(160deg,#111827,#1d4ed8,#60a5fa);
+
+.konami-card {
+    background: linear-gradient(160deg,#111827,#2563eb,#60a5fa);
     border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.45);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     position: relative;
 }
+
 .badge-label {
     position: absolute;
     top: 15px;
     right: 15px;
     background: gold;
     color: black;
-    padding: 6px 10px;
+    padding: 6px 12px;
     border-radius: 8px;
     font-weight: bold;
 }
+
 .player-photo {
     width: 100%;
-    height: 250px;
+    height: 260px;
     object-fit: cover;
     border-radius: 15px;
     margin-bottom: 15px;
 }
   .player-name {
+    text-align: center;
     font-size: 28px;
     font-weight: bold;
-    text-align: center;
+    margin-bottom: 15px;
 }
-.player-info p { margin: 6px 0; }
+
 .section {
     background: rgba(255,255,255,0.1);
-    padding: 15px;
     border-radius: 12px;
+    padding: 15px;
     margin-top: 15px;
 }
-.scan-btn {
-    width: 100%;
-    padding: 15px;
-    margin-top: 20px;
-    border: none;
-    border-radius: 12px;
-    background: #22c55e;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
+
+.section p {
+    margin: 7px 0;
 }
-   #msg {
+
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+a {
+    color: #facc15;
+}
+
+#msg {
     text-align: center;
     margin-top: 15px;
-    font-size: 18px;
     font-weight: bold;
 }
-a { color: #facc15; }
 </style>
 </head>
 <body>
  <div class="container">
     <div class="konami-card">
-        <div class="badge-label" id="badge">BADGE OFFICIEL</div>
-        <img id="photo" class="player-photo" src="default-player.jpg" alt="Photo joueur">
-        <div class="player-name" id="fullName">Chargement joueur...</div>
+        <div class="badge-label" id="badge">BADGE</div>
 
-        <div class="section player-info">
+        <img id="photo" class="player-photo" src="default-player.jpg" alt="Photo joueur">
+
+        <div class="player-name" id="fullName">Chargement...</div>
+
+        <div class="section">
             <p><strong>Âge :</strong> <span id="age"></span></p>
             <p><strong>Poids :</strong> <span id="poids"></span></p>
             <p><strong>Catégorie :</strong> <span id="categorie"></span></p>
@@ -96,19 +104,17 @@ a { color: #facc15; }
         </div>
     </div>
 
-    <button class="scan-btn" onclick="scanNFC()">Scanner Badge NFC</button>
     <div id="msg"></div>
+
+    <div class="footer">
+        Carte officielle Académie Football Premium
+    </div>
 </div>
+ <script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQJZFTbD0Q43Oyv8Jfu-XgU9opSw97dwNPxpZfvL7n-z1DU8ZMJEEVKySp0re0BkkqJA/exec";
 
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPcsWMILoyoLwXTlusgRLFJLkyZ_aCx9vM27z9KYZEihdKJ4RrZrbrUlMuIOo-nuf0pg/exec";
-const DEFAULT_PLAYER_ID = "AFEX-U13-0007"; // joueur affiché automatiquement
-
-function getReaderID() {
-    return "COACH-U13";
-}   
-  const urlParams = new URLSearchParams(window.location.search);
-const playerId = urlParams.get("player") || "AFEX-U13-0007";
+const urlParams = new URLSearchParams(window.location.search);
+const playerId = urlParams.get("player_id") || "100";
 
 window.onload = function() {
     loadPlayer(playerId);
@@ -116,46 +122,23 @@ window.onload = function() {
 
 function loadPlayer(playerId) {
     fetch(`${SCRIPT_URL}?player_id=${playerId}`)
-        .then(res => res.json())
+        .then(response => response.json())
         .then(data => {
+            console.log(data);
+
             if (data.status === "OK") {
                 updateCard(data);
-            }
-        });
-}
-
-async function scanNFC() {
-    try {
-        const reader = new NDEFReader();
-        await reader.scan();
-
-        msg("Scan en cours...", "yellow");
-
-        reader.onreading = event => {
-            const uid = event.serialNumber;
-            fetchPlayer(uid);
-            navigator.vibrate(200);
-        };
-    } catch (error) {
-        msg("NFC non supporté sur cet appareil", "red");
-    }
-}
-   function fetchPlayer(uid) {
-    const reader = getReaderID();
-
-    fetch(`${SCRIPT_URL}?uid=${uid}&reader=${reader}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "OK") {
-                updateCard(data);
-                msg(`✔ Présence validée : ${data.nom} ${data.prenom}`, "lightgreen");
             } else {
-                msg("✖ Badge refusé", "red");
+                msg("Joueur introuvable", "red");
             }
+        })
+        .catch(error => {
+            console.error(error);
+            msg("Erreur de connexion", "red");
         });
 }
 function updateCard(data) {
-    document.getElementById("photo").src = data.photo;
+    document.getElementById("photo").src = data.photo || "default-player.jpg";
     document.getElementById("fullName").innerText = data.nom + " " + data.prenom;
     document.getElementById("age").innerText = data.age + " ans";
     document.getElementById("poids").innerText = data.poids + " kg";
@@ -164,12 +147,14 @@ function updateCard(data) {
     document.getElementById("emplacement").innerText = data.emplacement;
     document.getElementById("saison").innerText = data.saison;
     document.getElementById("coach").innerText = data.coach;
+
     document.getElementById("telephone").innerText = data.telephone;
     document.getElementById("telephone").href = "tel:" + data.telephone;
+
     document.getElementById("facebook").href = data.facebook;
+
     document.getElementById("badge").innerText = data.badge;
 }
-
 function msg(text, color) {
     const m = document.getElementById("msg");
     m.innerText = text;
@@ -178,4 +163,4 @@ function msg(text, color) {
 </script>
 
 </body>
-</html> 
+</html>
