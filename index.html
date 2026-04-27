@@ -110,7 +110,6 @@ a {
              src="https://via.placeholder.com/400x500?text=Photo+Joueur"
              alt="Photo joueur">
 
-        <!-- BOUTON CHANGER PHOTO -->
         <button class="btn-photo" onclick="document.getElementById('fileInput').click()">
             📷 Changer photo joueur
         </button>
@@ -156,14 +155,23 @@ window.onload = () => loadPlayer(playerId);
 function loadPlayer(playerId) {
 
     fetch(`${SCRIPT_URL}?player_id=${playerId}`)
-        .then(r => r.json())
+        .then(async r => {
+
+            const text = await r.text();
+            console.log("RAW API:", text);
+
+            return JSON.parse(text);
+        })
         .then(data => {
 
-            if (data.status === "OK") {
-                updateCard(data);
-            } else {
+            console.log("DATA:", data);
+
+            if (!data || data.status !== "OK") {
                 msg("Joueur introuvable", "red");
+                return;
             }
+
+            updateCard(data);
 
         })
         .catch(err => {
@@ -180,24 +188,24 @@ function updateCard(data) {
     document.getElementById("fullName").innerText =
         (data.nom || "") + " " + (data.prenom || "");
 
-    document.getElementById("age").innerText = data.age || "";
-    document.getElementById("poids").innerText = data.poids || "";
-    document.getElementById("categorie").innerText = data.categorie || "";
-    document.getElementById("poste").innerText = data.poste || "";
-    document.getElementById("emplacement").innerText = data.emplacement || "";
-    document.getElementById("saison").innerText = data.saison || "";
-    document.getElementById("coach").innerText = data.coach || "";
+    document.getElementById("age").innerText = data.age ?? "";
+    document.getElementById("poids").innerText = data.poids ?? "";
+    document.getElementById("categorie").innerText = data.categorie ?? "";
+    document.getElementById("poste").innerText = data.poste ?? "";
+    document.getElementById("emplacement").innerText = data.emplacement ?? "";
+    document.getElementById("saison").innerText = data.saison ?? "";
+    document.getElementById("coach").innerText = data.coach ?? "";
 
-    document.getElementById("telephone").innerText = data.telephone || "";
-    document.getElementById("telephone").href = "tel:" + (data.telephone || "");
+    document.getElementById("telephone").innerText = data.telephone ?? "";
+    document.getElementById("telephone").href = "tel:" + (data.telephone ?? "");
 
-    document.getElementById("facebook").href = data.facebook || "#";
+    document.getElementById("facebook").href = data.facebook ?? "#";
 
-    document.getElementById("badge").innerText = data.badge || "PLAYER";
+    document.getElementById("badge").innerText = data.badge ?? "PLAYER";
 }
 
 /* =========================
-   UPLOAD PHOTO
+UPLOAD PHOTO
 ========================= */
 
 document.getElementById("fileInput").addEventListener("change", function () {
@@ -208,10 +216,7 @@ document.getElementById("fileInput").addEventListener("change", function () {
     const reader = new FileReader();
 
     reader.onload = function () {
-
-        const base64 = reader.result;
-
-        uploadPhoto(base64);
+        uploadPhoto(reader.result);
     };
 
     reader.readAsDataURL(file);
@@ -221,20 +226,23 @@ function uploadPhoto(base64) {
 
     fetch(SCRIPT_URL, {
         method: "POST",
-        body: new URLSearchParams({
-            player_id: playerId,
-            image_url: base64
-        })
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "player_id=" + encodeURIComponent(playerId) +
+            "&image_url=" + encodeURIComponent(base64)
     })
-    .then(r => r.json())
-    .then(data => {
+    .then(r => r.text())
+    .then(text => {
+
+        console.log("UPLOAD RAW:", text);
+
+        const data = JSON.parse(text);
 
         if (data.status === "OK") {
             msg("Photo mise à jour ✔", "green");
-
-            // mise à jour immédiate
             document.getElementById("photo").src = base64;
-
         } else {
             msg("Erreur upload", "red");
         }
