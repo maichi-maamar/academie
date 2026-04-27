@@ -108,7 +108,8 @@ a {
         <img id="photo"
              class="player-photo"
              src="https://via.placeholder.com/400x500?text=Photo+Joueur"
-             alt="Photo joueur">
+             alt="Photo joueur"
+             onerror="this.src='https://via.placeholder.com/400x500?text=Photo'">
 
         <button class="btn-photo" onclick="document.getElementById('fileInput').click()">
             📷 Changer photo joueur
@@ -145,7 +146,7 @@ a {
 
 <script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4wlTFHL9EQPJeYDhPOltIEWDZLs6h-p8wqG8iJDPthyJzptbds7lM7AI_if1fUEWUlw/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLyWJNQUnq53_0YClXBqHjXM2w1J-3vyqdX_36Ot2HJ9UGQvWjbedDkqs_nT5OGisZJA/exec";
 
 const urlParams = new URLSearchParams(window.location.search);
 const playerId = urlParams.get("player_id") || "100";
@@ -155,16 +156,17 @@ window.onload = () => loadPlayer(playerId);
 function loadPlayer(playerId) {
 
     fetch(`${SCRIPT_URL}?player_id=${playerId}`)
-        .then(async r => {
+        .then(r => r.text())
+        .then(text => {
 
-            const text = await r.text();
-            console.log("RAW API:", text);
+            console.log("RAW:", text);
 
-            return JSON.parse(text);
-        })
-        .then(data => {
-
-            console.log("DATA:", data);
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error("JSON invalide");
+            }
 
             if (!data || data.status !== "OK") {
                 msg("Joueur introuvable", "red");
@@ -172,7 +174,6 @@ function loadPlayer(playerId) {
             }
 
             updateCard(data);
-
         })
         .catch(err => {
             console.error(err);
@@ -186,22 +187,22 @@ function updateCard(data) {
         data.photo || "https://via.placeholder.com/400x500?text=Photo";
 
     document.getElementById("fullName").innerText =
-        (data.nom || "") + " " + (data.prenom || "");
+        `${data.nom || ""} ${data.prenom || ""}`;
 
-    document.getElementById("age").innerText = data.age ?? "";
-    document.getElementById("poids").innerText = data.poids ?? "";
-    document.getElementById("categorie").innerText = data.categorie ?? "";
-    document.getElementById("poste").innerText = data.poste ?? "";
-    document.getElementById("emplacement").innerText = data.emplacement ?? "";
-    document.getElementById("saison").innerText = data.saison ?? "";
-    document.getElementById("coach").innerText = data.coach ?? "";
+    document.getElementById("age").innerText = data.age || "";
+    document.getElementById("poids").innerText = data.poids || "";
+    document.getElementById("categorie").innerText = data.categorie || "";
+    document.getElementById("poste").innerText = data.poste || "";
+    document.getElementById("emplacement").innerText = data.emplacement || "";
+    document.getElementById("saison").innerText = data.saison || "";
+    document.getElementById("coach").innerText = data.coach || "";
 
-    document.getElementById("telephone").innerText = data.telephone ?? "";
-    document.getElementById("telephone").href = "tel:" + (data.telephone ?? "");
+    document.getElementById("telephone").innerText = data.telephone || "";
+    document.getElementById("telephone").href = "tel:" + (data.telephone || "");
 
-    document.getElementById("facebook").href = data.facebook ?? "#";
+    document.getElementById("facebook").href = data.facebook || "#";
 
-    document.getElementById("badge").innerText = data.badge ?? "PLAYER";
+    document.getElementById("badge").innerText = data.badge || "PLAYER";
 }
 
 /* =========================
@@ -236,9 +237,14 @@ function uploadPhoto(base64) {
     .then(r => r.text())
     .then(text => {
 
-        console.log("UPLOAD RAW:", text);
+        console.log("UPLOAD:", text);
 
-        const data = JSON.parse(text);
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            throw new Error("Upload JSON invalide");
+        }
 
         if (data.status === "OK") {
             msg("Photo mise à jour ✔", "green");
