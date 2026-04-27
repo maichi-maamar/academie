@@ -93,12 +93,10 @@ a {
 
         <div class="badge-label" id="badge">BADGE</div>
 
-        <!-- Photo dynamique -->
         <img id="photo"
              class="player-photo"
              src="https://via.placeholder.com/400x500?text=Photo+Joueur"
-             alt="Photo joueur"
-             onerror="this.src='https://via.placeholder.com/400x500?text=Photo+Indisponible';">
+             alt="Photo joueur">
 
         <div class="player-name" id="fullName">Chargement...</div>
 
@@ -114,6 +112,7 @@ a {
         <div class="section">
             <p><strong>Coach :</strong> <span id="coach"></span></p>
             <p><strong>Téléphone :</strong> <a id="telephone"></a></p>
+            <p><strong>WhatsApp :</strong> <a id="whatsapp" target="_blank">Contacter</a></p>
             <p><strong>Facebook :</strong> <a id="facebook" target="_blank">Page officielle</a></p>
         </div>
 
@@ -129,22 +128,20 @@ a {
 
 <script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9rNE6ckhVMF8nBYx63EpbZWw7vCWetZKNd7TUQDfEqLlapnje8BIUmxTghNk1zMg7rQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSOZ94_A8Z9x6E8wtzseepHLn_NRLgMTu1-lqrp4Xlr8qM3el2bAofVF6UxXC6vMkLg/exec";
 
-// Lecture dynamique de l'URL
 const urlParams = new URLSearchParams(window.location.search);
 const playerId = urlParams.get("player_id") || "100";
 
-// Chargement auto
-window.onload = function() {
-    loadPlayer(playerId);
-};
+window.onload = () => loadPlayer(playerId);
 
-// Récupération données Google Sheets
 function loadPlayer(playerId) {
 
     fetch(`${SCRIPT_URL}?player_id=${playerId}`)
-        .then(response => response.json())
+        .then(r => {
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            return r.json();
+        })
         .then(data => {
 
             console.log(data);
@@ -156,72 +153,67 @@ function loadPlayer(playerId) {
             }
 
         })
-        .catch(error => {
-
-            console.error(error);
-            msg("Erreur de connexion", "red");
-
+        .catch(err => {
+            console.error(err);
+            msg("Erreur de chargement API", "red");
         });
 }
 
-// Mise à jour carte complète
 function updateCard(data) {
 
-    // Photo dynamique sécurisée
-    const photoElement = document.getElementById("photo");
-
-    if (data.photo && data.photo.trim() !== "") {
-        photoElement.src = data.photo;
-    } else {
-        photoElement.src =
-            "https://via.placeholder.com/400x500?text=Photo+Joueur";
-    }
+    // PHOTO dynamique sécurisée
+    document.getElementById("photo").src =
+        (data.photo && data.photo.trim() !== "")
+        ? data.photo
+        : "https://via.placeholder.com/400x500?text=Photo";
 
     document.getElementById("fullName").innerText =
-        data.nom + " " + data.prenom;
+        (data.nom || "") + " " + (data.prenom || "");
 
     document.getElementById("age").innerText =
-        data.age + " ans";
+        data.age || "";
 
     document.getElementById("poids").innerText =
-        data.poids + " kg";
+        data.poids || "";
 
     document.getElementById("categorie").innerText =
-        data.categorie;
+        data.categorie || "";
 
     document.getElementById("poste").innerText =
-        data.poste;
+        data.poste || "";
 
     document.getElementById("emplacement").innerText =
-        data.emplacement;
+        data.emplacement || "";
 
     document.getElementById("saison").innerText =
-        data.saison;
+        data.saison || "";
 
     document.getElementById("coach").innerText =
-        data.coach;
+        data.coach || "";
 
-    // Téléphone dynamique
+    // TELEPHONE
     document.getElementById("telephone").innerText =
-        data.telephone;
+        data.telephone || "";
 
     document.getElementById("telephone").href =
-        "tel:" + data.telephone;
+        "tel:" + (data.telephone || "");
 
-    // Facebook dynamique
+    // WHATSAPP
+    const wa = (data.telephone || "").replace("+", "").replace(/\s/g, "");
+    document.getElementById("whatsapp").href =
+        "https://wa.me/" + wa;
+
+    // FACEBOOK
     document.getElementById("facebook").href =
-        data.facebook;
+        data.facebook || "#";
 
-    // Badge dynamique
+    // BADGE
     document.getElementById("badge").innerText =
-        data.badge;
+        data.badge || "PLAYER";
 }
 
-// Messages
 function msg(text, color) {
-
     const m = document.getElementById("msg");
-
     m.innerText = text;
     m.style.color = color;
 }
