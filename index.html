@@ -101,52 +101,50 @@ a {
 
 <div class="container">
 
-    <div class="konami-card">
+<div class="konami-card">
 
-        <div class="badge-label" id="badge">BADGE</div>
+    <div class="badge-label" id="badge">BADGE</div>
 
-        <img id="photo"
-             class="player-photo"
-             src="https://via.placeholder.com/400x500?text=Photo+Joueur"
-             alt="Photo joueur"
-             onerror="this.src='https://via.placeholder.com/400x500?text=Photo'">
+    <img id="photo"
+         class="player-photo"
+         src="https://via.placeholder.com/400x500?text=Photo+Joueur"
+         alt="Photo joueur">
 
-        <button class="btn-photo" onclick="document.getElementById('fileInput').click()">
-            📷 Changer photo joueur
-        </button>
+    <button class="btn-photo" onclick="document.getElementById('fileInput').click()">
+        📷 Changer photo joueur
+    </button>
 
-        <input type="file" id="fileInput" accept="image/*" style="display:none;">
+    <input type="file" id="fileInput" accept="image/*" style="display:none;">
 
-        <div class="player-name" id="fullName">Chargement...</div>
+    <div class="player-name" id="fullName">Chargement...</div>
 
-        <div class="section">
-            <p><strong>Âge :</strong> <span id="age"></span></p>
-            <p><strong>Poids :</strong> <span id="poids"></span></p>
-            <p><strong>Catégorie :</strong> <span id="categorie"></span></p>
-            <p><strong>Poste :</strong> <span id="poste"></span></p>
-            <p><strong>Emplacement :</strong> <span id="emplacement"></span></p>
-            <p><strong>Saison :</strong> <span id="saison"></span></p>
-        </div>
-
-        <div class="section">
-            <p><strong>Coach :</strong> <span id="coach"></span></p>
-            <p><strong>Téléphone :</strong> <a id="telephone"></a></p>
-            <p><strong>Facebook :</strong> <a id="facebook" target="_blank">Page officielle</a></p>
-        </div>
-
+    <div class="section">
+        <p><strong>Âge :</strong> <span id="age"></span></p>
+        <p><strong>Poids :</strong> <span id="poids"></span></p>
+        <p><strong>Catégorie :</strong> <span id="categorie"></span></p>
+        <p><strong>Poste :</strong> <span id="poste"></span></p>
+        <p><strong>Emplacement :</strong> <span id="emplacement"></span></p>
+        <p><strong>Saison :</strong> <span id="saison"></span></p>
     </div>
 
-    <div id="msg"></div>
-
-    <div class="footer">
-        Carte officielle Académie Football Premium
+    <div class="section">
+        <p><strong>Coach :</strong> <span id="coach"></span></p>
+        <p><strong>Téléphone :</strong> <a id="telephone"></a></p>
     </div>
+
+</div>
+
+<div id="msg"></div>
+
+<div class="footer">
+    Carte officielle Académie Football Premium
+</div>
 
 </div>
 
 <script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLyWJNQUnq53_0YClXBqHjXM2w1J-3vyqdX_36Ot2HJ9UGQvWjbedDkqs_nT5OGisZJA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNpVkXo_hIURuMlDS3zB9mhzYkWLYgVqMqWCMg0idETURY2Dlp4GuEdcFWnlVvXyR2SA/exec";
 
 const urlParams = new URLSearchParams(window.location.search);
 const playerId = urlParams.get("player_id") || "100";
@@ -159,14 +157,7 @@ function loadPlayer(playerId) {
         .then(r => r.text())
         .then(text => {
 
-            console.log("RAW:", text);
-
-            let data;
-            try {
-                data = JSON.parse(text);
-            } catch (e) {
-                throw new Error("JSON invalide");
-            }
+            let data = JSON.parse(text);
 
             if (!data || data.status !== "OK") {
                 msg("Joueur introuvable", "red");
@@ -175,19 +166,13 @@ function loadPlayer(playerId) {
 
             updateCard(data);
         })
-        .catch(err => {
-            console.error(err);
-            msg("Erreur API", "red");
-        });
+        .catch(() => msg("Erreur API", "red"));
 }
 
 function updateCard(data) {
 
-    document.getElementById("photo").src =
-        data.photo || "https://via.placeholder.com/400x500?text=Photo";
-
     document.getElementById("fullName").innerText =
-        `${data.nom || ""} ${data.prenom || ""}`;
+        (data.nom || "") + " " + (data.prenom || "");
 
     document.getElementById("age").innerText = data.age || "";
     document.getElementById("poids").innerText = data.poids || "";
@@ -200,14 +185,14 @@ function updateCard(data) {
     document.getElementById("telephone").innerText = data.telephone || "";
     document.getElementById("telephone").href = "tel:" + (data.telephone || "");
 
-    document.getElementById("facebook").href = data.facebook || "#";
-
     document.getElementById("badge").innerText = data.badge || "PLAYER";
+
+    // photo par défaut
+    document.getElementById("photo").src =
+        data.photo || "https://via.placeholder.com/400x500?text=Photo";
 }
 
-/* =========================
-UPLOAD PHOTO
-========================= */
+/* ================= PHOTO UPLOAD ================= */
 
 document.getElementById("fileInput").addEventListener("change", function () {
 
@@ -217,47 +202,11 @@ document.getElementById("fileInput").addEventListener("change", function () {
     const reader = new FileReader();
 
     reader.onload = function () {
-        uploadPhoto(reader.result);
+        document.getElementById("photo").src = reader.result; // affichage instantané
     };
 
     reader.readAsDataURL(file);
 });
-
-function uploadPhoto(base64) {
-
-    fetch(SCRIPT_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body:
-            "player_id=" + encodeURIComponent(playerId) +
-            "&image_url=" + encodeURIComponent(base64)
-    })
-    .then(r => r.text())
-    .then(text => {
-
-        console.log("UPLOAD:", text);
-
-        let data;
-        try {
-            data = JSON.parse(text);
-        } catch (e) {
-            throw new Error("Upload JSON invalide");
-        }
-
-        if (data.status === "OK") {
-            msg("Photo mise à jour ✔", "green");
-            document.getElementById("photo").src = base64;
-        } else {
-            msg("Erreur upload", "red");
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        msg("Erreur serveur", "red");
-    });
-}
 
 function msg(text, color) {
     const m = document.getElementById("msg");
