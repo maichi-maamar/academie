@@ -112,7 +112,6 @@ a {
         <div class="section">
             <p><strong>Coach :</strong> <span id="coach"></span></p>
             <p><strong>Téléphone :</strong> <a id="telephone"></a></p>
-            <p><strong>WhatsApp :</strong> <a id="whatsapp" target="_blank">Contacter</a></p>
             <p><strong>Facebook :</strong> <a id="facebook" target="_blank">Page officielle</a></p>
         </div>
 
@@ -198,11 +197,7 @@ function updateCard(data) {
     document.getElementById("telephone").href =
         "tel:" + (data.telephone || "");
 
-    // WHATSAPP
-    const wa = (data.telephone || "").replace("+", "").replace(/\s/g, "");
-    document.getElementById("whatsapp").href =
-        "https://wa.me/" + wa;
-
+    
     // FACEBOOK
     document.getElementById("facebook").href =
         data.facebook || "#";
